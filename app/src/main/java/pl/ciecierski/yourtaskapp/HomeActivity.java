@@ -5,8 +5,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -41,7 +44,7 @@ public class HomeActivity extends AppCompatActivity {
     //    firebase
     private DatabaseReference mDatabase;
     private FirebaseAuth mAuth;
-
+    Query query;
 
     //    recycler..
     private RecyclerView recyclerView;
@@ -51,7 +54,13 @@ public class HomeActivity extends AppCompatActivity {
     private String note;
     private String post_key;
 
-    Query query;
+
+    //    update input field
+    private EditText titleUp;
+    private EditText noteUp;
+    private Button btnDeleteUp;
+    private Button btnUpdateUp;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,11 +152,6 @@ public class HomeActivity extends AppCompatActivity {
         super.onStart();
 
 
-//        FirebaseListOptions<Data> options =
-//                new FirebaseListOptions.Builder<Data>()
-//                        .setQuery(query, Data.class)
-//                        .build();
-
         FirebaseRecyclerOptions<Data> options =
                 new FirebaseRecyclerOptions.Builder<Data>()
                         .setQuery(query, Data.class)
@@ -159,11 +163,27 @@ public class HomeActivity extends AppCompatActivity {
                 ) {
 
             @Override
-            protected void onBindViewHolder(@NonNull MyViewHolder holder, int position, @NonNull Data model) {
+            protected void onBindViewHolder(@NonNull MyViewHolder viewHolder, final int position, @NonNull final Data model) {
 
-                MyViewHolder.setTitle(model.getTitle());
-                MyViewHolder.setNote(model.getNote());
-                MyViewHolder.setDate(model.getDate());
+                viewHolder.setTitle(model.getTitle());
+                viewHolder.setNote(model.getNote());
+                viewHolder.setDate(model.getDate());
+
+                viewHolder.myview.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+
+                        post_key = getRef(position).getKey();
+                        title = model.getTitle();
+                        note = model.getNote();
+
+
+                        updateData();
+
+                    }
+                });
+
             }
 
             @Override
@@ -184,9 +204,10 @@ public class HomeActivity extends AppCompatActivity {
     }
 
 
-    public static class MyViewHolder extends RecyclerView.ViewHolder {
+    public class MyViewHolder extends RecyclerView.ViewHolder {
 
-        private static View myview;
+
+        View myview;
 
 
         public MyViewHolder(View itemView) {
@@ -194,17 +215,17 @@ public class HomeActivity extends AppCompatActivity {
             myview = itemView;
         }
 
-        public static void setTitle(String title) {
+        public void setTitle(String title) {
             TextView mTitle = myview.findViewById(R.id.title);
             mTitle.setText(title);
         }
 
-        public static void setNote(String note) {
+        public void setNote(String note) {
             TextView mNote = myview.findViewById(R.id.note);
             mNote.setText(note);
         }
 
-        public static void setDate(String date) {
+        public void setDate(String date) {
             TextView mDate = myview.findViewById(R.id.date);
             mDate.setText(date);
 
@@ -212,6 +233,62 @@ public class HomeActivity extends AppCompatActivity {
 
 
     }
+
+
+    public void updateData() {
+
+
+        AlertDialog.Builder myDialog = new AlertDialog.Builder(HomeActivity.this);
+
+        LayoutInflater inflater = LayoutInflater.from(HomeActivity.this);
+
+
+        View myview = inflater.inflate(R.layout.updateinputfield, null);
+        myDialog.setView(myview);
+        final AlertDialog dialog = myDialog.create();
+
+        titleUp = myview.findViewById(R.id.edt_title_upd);
+        noteUp = myview.findViewById(R.id.edt_note_upd);
+        btnDeleteUp = myview.findViewById(R.id.btn_delete_upd);
+        btnUpdateUp = myview.findViewById(R.id.btn_update_upd);
+
+        titleUp.setText(title);
+        titleUp.setSelection(title.length());
+        noteUp.setText(note);
+        noteUp.setSelection(note.length());
+
+
+        btnUpdateUp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                title = titleUp.getText().toString().trim();
+                note = noteUp.getText().toString().trim();
+                String mDate = DateFormat.getDateInstance().format(new Date());
+
+                Data data = new Data(title, note, mDate, post_key);
+                mDatabase.child(post_key).setValue(data);
+
+
+                dialog.dismiss();
+            }
+        });
+
+
+        btnDeleteUp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                mDatabase.child(post_key).removeValue();
+
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
