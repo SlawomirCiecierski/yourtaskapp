@@ -5,11 +5,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.app.Activity;
+
 import android.app.AlertDialog;
-import android.content.Context;
+
 import android.content.Intent;
-import android.content.res.Resources;
+
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -54,7 +54,6 @@ public class HomeActivity extends AppCompatActivity {
     private String note;
     private String post_key;
 
-
     //    update input field
     private EditText titleUp;
     private EditText noteUp;
@@ -84,7 +83,6 @@ public class HomeActivity extends AppCompatActivity {
 //recycler
 
         recyclerView = findViewById(R.id.recycler);
-
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setReverseLayout(true);
@@ -135,10 +133,8 @@ public class HomeActivity extends AppCompatActivity {
 
                         dialog.dismiss();
 
-
                     }
                 });
-
 
                 dialog.show();
             }
@@ -173,7 +169,6 @@ public class HomeActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
 
-
                         post_key = getRef(position).getKey();
                         title = model.getTitle();
                         note = model.getNote();
@@ -194,10 +189,8 @@ public class HomeActivity extends AppCompatActivity {
                 return new MyViewHolder(view);
             }
 
-
         };
         adapter.startListening();
-
 
         recyclerView.setAdapter(adapter);
 
@@ -206,9 +199,7 @@ public class HomeActivity extends AppCompatActivity {
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
 
-
         View myview;
-
 
         public MyViewHolder(View itemView) {
             super(itemView);
@@ -230,7 +221,6 @@ public class HomeActivity extends AppCompatActivity {
             mDate.setText(date);
 
         }
-
 
     }
 
